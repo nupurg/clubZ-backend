@@ -1,0 +1,12 @@
+[08-Feb-2018 13:37:14 UTC] PHP Fatal error:  Call to undefined method Service::check_lang() in /home/clubzcp/public_html/dev/application/modules/service/controllers/Service.php on line 10
+[08-Feb-2018 13:42:41 UTC] PHP Fatal error:  Call to undefined method Common_model::get_records_by_id() in /home/clubzcp/public_html/dev/application/modules/service/controllers/Service.php on line 31
+[08-Feb-2018 13:47:06 UTC] PHP Fatal error:  Call to undefined method Service_model::updateDeviceIdToken() in /home/clubzcp/public_html/dev/application/modules/service/models/Service_model.php on line 147
+[15-Feb-2018 05:06:55 UTC] PHP Fatal error:  Call to undefined method Common_model::check_data() in /home/clubzcp/public_html/dev/application/modules/service/models/User_model.php on line 64
+[15-Feb-2018 11:19:14 UTC] PHP Parse error:  syntax error, unexpected '{', expecting '(' in /home/clubzcp/public_html/dev/application/modules/admin/controllers/Users.php on line 14
+[15-Feb-2018 11:19:43 UTC] PHP Parse error:  syntax error, unexpected '.' in /home/clubzcp/public_html/dev/application/modules/admin/controllers/Users.php on line 32
+[15-Feb-2018 11:19:44 UTC] PHP Parse error:  syntax error, unexpected '.' in /home/clubzcp/public_html/dev/application/modules/admin/controllers/Users.php on line 32
+[15-Feb-2018 13:43:30 UTC] PHP Parse error:  syntax error, unexpected '$icon' (T_VARIABLE) in /home/clubzcp/public_html/dev/application/modules/admin/controllers/Users.php on line 47
+[02-Apr-2018 06:03:52 UTC] PHP Fatal error:  Call to undefined method Common_model::insertData() in /home/clubzcp/public_html/dev/application/modules/service/controllers/Service.php on line 332
+[02-Apr-2018 06:05:11 UTC] PHP Fatal error:  Call to a member function insertData() on null in /home/clubzcp/public_html/dev/application/modules/service/controllers/Service.php on line 332
+[02-Apr-2018 06:08:37 UTC] PHP Fatal error:  Call to undefined method Common_model::insertData() in /home/clubzcp/public_html/dev/application/modules/service/controllers/Service.php on line 332
+[02-Apr-2018 08:38:28 UTC] PHP Fatal error:  Call to undefined function getsingle() in /home/clubzcp/public_html/dev/application/modules/service/controllers/Service.php on line 338
