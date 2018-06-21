@@ -59,6 +59,6 @@ $lang['response_disjoin_activity'] = 'Activity disjoined successfully';
 $lang['response_unconfirm_activity'] = 'Activity denied successfully';
 $lang['response_nickname_clubmember'] = 'Nickname updated successfully';
 $lang['response_max_user_activity'] = 'Sorry!!!we can not confirm the number of members you are applying for,Please try with less number of members';
-$lang['response_no_place_confirm_activity'] = 'Sorry!!!we dont have any vacant place to confirm more memeber';
+$lang['response_no_place_confirm_activity'] = 'Sorry!!!we dont have any vacant place to confirm more member';
 $lang['response_news_feed_update'] = 'News updated successfully';
 $lang['response_delete_news_feed'] = 'News deleted successfully';

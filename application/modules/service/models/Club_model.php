@@ -386,9 +386,12 @@ class Club_model extends CI_Model {
             $data['offset'] = 0; $data['limit']= 10; 
         }
         $clubType = "";
-        if(!empty($data['clubType'])){
-            $clubType = 'AND c.club_type = "'.$data['clubType'].'"';
+        if(!empty($data['clubType']) && $data['clubType'] == '1'){
+            $clubType = 'AND (c.club_type = "1" or c.club_type = "3")';
+        }elseif(!empty($data['clubType']) && $data['clubType'] == '2'){
+            $clubType = 'AND c.club_type = "2"';
         }
+        
         $clubImageUrl = base_url().CLUB_MAIN_IMAGE;
         $defaultClubImage = base_url().DEFAULT_CLUB_IMAGE;
 
@@ -405,7 +408,7 @@ class Club_model extends CI_Model {
                     THEN cl.profile_image
                 ELSE
                     concat("'.$userImg.'",cl.profile_image) 
-            END) as profile_image,COALESCE(cum1.club_user_status,"") as club_user_status,cc.club_category_name,IF(cl.club_image IS NULL or cl.club_image ="","'.$defaultClubImage.'",concat("'.$clubImageUrl.'",cl.club_image)) as club_image,IF(cl.club_icon IS NULL or cl.club_icon ="","'.$defaultClubIcon.'",concat("'.$clubIconUrl.'",cl.club_icon)) as club_icon,count(u1.userId) as members FROM 
+            END) as profile_image,COALESCE(cum1.club_user_status,"") as club_user_status,cum1.clubUserId,cum1.is_allow_feeds,cc.club_category_name,IF(cl.club_image IS NULL or cl.club_image ="","'.$defaultClubImage.'",concat("'.$clubImageUrl.'",cl.club_image)) as club_image,IF(cl.club_icon IS NULL or cl.club_icon ="","'.$defaultClubIcon.'",concat("'.$clubIconUrl.'",cl.club_icon)) as club_icon,count(u1.userId) as members FROM 
             (SELECT c.*,u.full_name,u.profile_image,u.is_profile_url
         FROM '.CLUBS.' as c
         LEFT JOIN '.CLUB_USER_MAPPING.' as cum ON c.clubId = cum.club_id
@@ -588,7 +591,7 @@ class Club_model extends CI_Model {
         $userImg = base_url().USER_MAIN_IMAGE;
 
         $userId = $this->authData->userId;
-        $where = array('cum.user_id'=>$userId,'cum.member_status'=>'1','cum.is_allow_feeds'=>'1','nf.status'=>'1','c.status'=>'1');
+        $where = array('cum.user_id'=>$userId,'cum.member_status'=>'1','cum.is_allow_feeds'=>'1','nf.status'=>'1','c.status'=>'1','cum.club_user_status'=>'1');
         $this->db->select('nf.newsFeedId,nf.is_comment_allow,nf.news_feed_title,nf.news_feed_description,nf.crd as datetime,c.club_name,count(distinct nfl.newsFeedsLikeId) as likes,nf.comment_count as comments,count(distinct nfb.newsFeedsBookmarkId) as bookmarks,IF(nfll.news_feed_id IS NULL or nfll.news_feed_id = "", 0, 1) as isLiked,IF(nfbb.news_feed_id IS NULL or nfbb.news_feed_id = "", 0, 1) as isBookmarked,IF(nf.news_feed_attachment IS NULL or nf.news_feed_attachment ="","",concat("'.$feedAttachUrl.'",nf.news_feed_attachment)) as news_feed_attachment,IF(c.club_image IS NULL or c.club_image ="","'.$defaultClubImage.'",concat("'.$clubImageUrl.'",c.club_image)) as club_image,IF(c.club_icon IS NULL or c.club_icon ="","'.$defaultClubIcon.'",concat("'.$clubIconUrl.'",c.club_icon)) as club_icon,nf.crd,now() as currentDateTime,u.userId,u.full_name,COALESCE(GROUP_CONCAT(nft.feed_filter_tag_name),"") as tagName,c.clubId,(case 
 
                 when (u.profile_image = "") 

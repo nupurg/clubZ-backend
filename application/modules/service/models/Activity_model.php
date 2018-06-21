@@ -7,10 +7,12 @@ class Activity_model extends CI_Model {
 
         $where = array('cum.club_id'=>$data['clubId'],'cum.club_user_status'=>'1','cum.member_status'=>'1');
         $this->db->select('u.userId,(case 
-                when (ut.tag_name IS NOT NULL || ut.tag_name != "") 
-                    THEN ut.tag_name
                 when (cum.user_nickname != "") 
                     THEN cum.user_nickname
+
+                when (ut.tag_name IS NOT NULL || ut.tag_name != "") 
+                    THEN ut.tag_name
+               
                 ELSE
                     u.full_name
             END) as name');
@@ -381,7 +383,7 @@ class Activity_model extends CI_Model {
                     THEN u1.profile_image
                 ELSE
                     concat("'.$userImg.'",u1.profile_image) 
-            END) as creator_profile_image');
+            END) as creator_profile_image,c.club_name');
         $this->db->from(ACTIVITIES.' as a');
         $this->db->join(CLUBS.' as c','a.club_id = c.clubId');
         $this->db->join(CLUB_CATEGORY.' as cc','c.club_category_id = cc.clubCategoryId AND cc.status = "1"'); 
@@ -392,7 +394,10 @@ class Activity_model extends CI_Model {
         $q = $this->db->get();
         if($q->num_rows()){
             $row = $q->row();
-            $row->next_event = $this->getNextEvent($activityId);
+            $nextEvent = $this->getNextEvent($activityId);
+            if($nextEvent){
+                $row->next_event = $nextEvent;
+            }
             return $row;
         }
 
@@ -402,7 +407,6 @@ class Activity_model extends CI_Model {
     //function to get next event of activity
     function getNextEvent($activityId){
 
-        $activityData = array();
         $where1 = array('ae.status'=>'1','ae.activity_id'=>$activityId);
         $where2 = "concat(ae.event_date,' ',ae.event_time) > now()"; 
 
@@ -417,9 +421,9 @@ class Activity_model extends CI_Model {
         if($query->num_rows() >0){
            
             $activityData = $query->row();
+            return $activityData;
         }
-        return $activityData;
-
+        
     }//End function
 
 

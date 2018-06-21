@@ -157,7 +157,8 @@ define('ACTIVITIES','activities');
 define('ACTIVITY_EVENTS','activity_events');
 define('ACTIVITY_JOIN','activity_join');
 define('ACTIVITY_CONFIRM','activity_confirm');
-
+define('ADS','ads');
+define('FAVORITE_ADS','favorite_ads');
 
 
 
@@ -178,6 +179,7 @@ define('DEFAULT_CLUB_ICON', 'backend_asset/custom/images/clubDefault.png');
 define('DEFAULT_FEED_ATTACH', 'backend_asset/custom/images/defaultProduct.png');
 define('ACTIVITY_IMAGE', 'uploads/activity_image/');
 define('DEFAULT_ACTIVITY_IMAGE', 'backend_asset/custom/images/clubDefault.png');
+define('AD_IMAGE', 'uploads/ad_image/');
 
 
 

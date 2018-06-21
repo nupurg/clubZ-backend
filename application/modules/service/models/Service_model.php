@@ -69,8 +69,7 @@ class Service_model extends CI_Model {
     //for get user information
     function userInfo($userId){
         
-        $this->db->select('userId,full_name,social_id,social_type,email,country_code,contact_no,profile_image,auth_token,device_type,device_token')->where($userId)->from(USERS);
-
+        $this->db->select('*')->where($userId)->from(USERS);
         $resultQuery = $this->db->get();
         if($resultQuery->num_rows()){
 

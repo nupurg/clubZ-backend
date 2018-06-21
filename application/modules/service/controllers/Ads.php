@@ -61,6 +61,54 @@ class Ads extends CommonService {
         $this->response($response); 
         
     }//End function
+
+
+    //For add to favourite the ad
+    public function favoriteAd_post(){
+
+        $this->form_validation->set_rules('adId','ad id','trim|required|numeric');
+        if($this->form_validation->run() == FALSE){
+            $response = array('status' => FAIL, 'message' => preg_replace("/[\\n\\r]+/", " ",strip_tags(validation_errors())));
+            $this->response($response);die;
+        }
+        $adId = $this->post('adId');
+        $w = array('adId'=>$adId);
+        $isAdExist = $this->common_model->is_data_exists(ADS,$w);
+        if(!$isAdExist){
+            $response = array('status'=>FAIL,'message'=>ResponseMessages::getStatusCodeMessage(118));
+            $this->response($response);
+        }
+        $userId = $this->authData->userId;
+        $data = array('ad_id'=>$adId,'user_id'=>$userId);
+        $isFav = $this->common_model->is_data_exists(FAVORITE_ADS,$data);
+        if($isFav){
+            $this->common_model->deleteData(FAVORITE_ADS,$data);
+            $response = array('status'=>SUCCESS,'message'=>ResponseMessages::getStatusCodeMessage(507),'isFav'=>0);//unfav
+            $this->response($response); 
+        }else{
+            $data['crd'] = date('Y-m-d H:i:s');
+            $this->common_model->insert_data(FAVORITE_ADS,$data);
+            $response = array('status'=>SUCCESS,'message'=>ResponseMessages::getStatusCodeMessage(507),'isFav'=>1);//fav
+            $this->response($response); 
+        }
+
+    }//End function
+
+
+    //For getting the ads list for those clubs in which i have joined
+    public function adsList_get(){
+
+        $this->load->model('ads_model');
+        $userId = $this->authData->userId;
+        $data['listType'] = $this->get('listType');
+        $data['offset'] = $this->get('offset');
+        $data['limit'] = $this->get('limit');
+        
+        $res = $this->ads_model->adsList($userId,$data);
+        $response = array('status'=>SUCCESS,'message'=>ResponseMessages::getStatusCodeMessage(507),'data'=>$res);
+        $this->response($response);
+
+    }//End function
     
 } //End class
 

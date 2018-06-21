@@ -17,7 +17,6 @@ class Activity extends CommonService {
     	$this->form_validation->set_rules('name','name','trim|required');
         $this->form_validation->set_rules('location','location','trim|required');
         $this->form_validation->set_rules('feeType','fee type','trim|required');
-        $this->form_validation->set_rules('fee','Fee','trim|required|numeric');
         $this->form_validation->set_rules('clubId','club id','trim|required');
         $this->form_validation->set_rules('minUsers','minimum users','trim|required|numeric');
         $this->form_validation->set_rules('maxUsers','maximum users','trim|required|numeric');

@@ -55,9 +55,14 @@ class User extends CommonService {
     function userProfile_get(){
 
         $userId = $this->get('userId');
-        $res = $this->User_model->userProfile($userId); 
+        $currentUserId = $this->authData->userId;
+        if($userId == $currentUserId){
+            $res = $this->User_model->myProfile($userId); 
+        }else{
+            $res = $this->User_model->otherProfile($userId,$currentUserId); 
+        }
         if($res){
-            $response = array('status'=>SUCCESS,'message'=>ResponseMessages::getStatusCodeMessage(512),'data'=>$res);
+            $response = array('status'=>SUCCESS,'message'=>ResponseMessages::getStatusCodeMessage(507),'data'=>$res);
         }else{
             $response = array('status'=>FAIL,'message'=>ResponseMessages::getStatusCodeMessage(118));
         }
@@ -76,7 +81,8 @@ class User extends CommonService {
         $countryCode = $this->post('countryCode');
         $dob = $this->post('dob');
         $email = $this->post('email');
-        $affiliates = $this->post('affiliates');
+        $removedAffiliates = $this->post('removedAffiliates');
+        $addAffiliates = $this->post('addAffiliates');
         $skills = $this->post('skills');
         $interests = $this->post('interests');
         $aboutMeVisibility = $this->post('aboutMeVisibility');
@@ -139,13 +145,64 @@ class User extends CommonService {
             $data['is_profile_url'] = "0";
             $data['profile_image'] = $profileImage;
         }
+        $wh = array('user_id'=>$userId);
+        if(!empty($removedAffiliates)){
+
+            $remove = explode(',',$removedAffiliates);
+            if(!empty($addAffiliates)){
+                $add = explode(',',$addAffiliates);
+                $common = array_intersect($add, $remove);
+                $newRemove = array_diff($remove, $common);
+            }else{
+                $newRemove = $remove;
+            }
+            if(!empty($newRemove)){
+                $this->db->where_in('affiliate_name',$newRemove);
+                $this->db->delete(USER_AFFILIATES,$wh);
+
+                $q = $this->db->select('userAffiliateId')->where_in('affiliate_name', $newRemove)->where($wh)->get(USER_AFFILIATES);
+
+                if($q->num_rows()){
+
+                    $resu = $q->result_array();
+                    foreach ($resu as $key => $value) {
+                        $aff[] = $value['userAffiliateId'];
+                    }
+                    $this->db->where_in('affiliate_id',$aff);
+                    $this->db->delete(ACTIVITY_JOIN);
+
+                    $this->db->where_in('affiliate_id',$aff);
+                    $this->db->delete(ACTIVITY_CONFIRM);  
+                }
+            }  
+        }
+
+        if(!empty($addAffiliates)){
+            $add = explode(',',$addAffiliates);
+            foreach ($add as $k => $val) {
+                
+                $affi['user_id'] = $userId;
+                $affi['affiliate_name'] = $val;
+                $isExist = $this->common_model->is_data_exists(USER_AFFILIATES,$affi);
+                if(!$isExist){
+                    $affi['crd'] = $affi['upd'] = date('Y-m-d H:i:s');
+                    $this->common_model->insert_data(USER_AFFILIATES,$affi);
+                }
+            }
+        }
 
         if(!empty($data) && isset($data)){
             $this->common_model->updateFields(USERS,$data,$where);
         }
-        if(!empty($affiliates) || !empty($skills) || !empty($interests)){
-           $this->User_model->updateUserMeta($affiliates,$skills,$interests,$userId);
+        $this->common_model->deleteData(USER_SKILLS,$wh);
+        $this->common_model->deleteData(USER_INTERESTS,$wh);
+            
+        if(!empty($skills) || !empty($interests)){
+
+            $userMeta = array('skills'=>$skills,'interests'=>$interests,'userId'=>$userId);
+            $this->User_model->updateUserMeta($userMeta);
         }
+        
         $response = array('status'=>SUCCESS,'message'=>'Profile updated successfully');
         $this->response($response);
 
@@ -299,6 +356,50 @@ class User extends CommonService {
         }
         $this->response($response);     
 
+    }//End function
+
+
+    //Function for adding club member as favorite or unfavorite by club owner
+    function updateContact_post(){
+
+        $this->form_validation->set_rules('clubUserId','club user id','trim|required|numeric');
+        $this->form_validation->set_rules('isFavorite','isfavorite','trim|required|numeric');
+
+        if($this->form_validation->run() == FALSE){
+            $response = array('status' => FAIL, 'message' => preg_replace("/[\\n\\r]+/", " ",strip_tags(validation_errors())));
+            $this->response($response);die;
+        }
+
+        $clubUserId = $this->post('clubUserId');
+        $where = array('clubUserId'=>$clubUserId);
+        $isclubUserExist = $this->common_model->is_data_exists(CLUB_USER_MAPPING,$where);
+        if(!$isclubUserExist){
+            $response = array('status'=>FAIL,'message'=>ResponseMessages::getStatusCodeMessage(533));
+            $this->response($response); 
+        }
+        $update['is_favorite'] = $this->post('isFavorite');
+        $update['upd'] = date('Y-m-d H:i:s');
+        $this->common_model->updateFields(CLUB_USER_MAPPING,$update,$where);
+        $response = array('status'=>SUCCESS,'message'=>ResponseMessages::getStatusCodeMessage(507),'isFavorite'=>$update['is_favorite']);
+        $this->response($response); 
+
+    }//End function
+
+
+     //Function for getting  contact list by club owner
+    function contactList_get(){
+
+        $userId = $this->authData->userId;
+        $data['offset'] = $this->get('offset');
+        $data['limit'] = $this->get('limit');
+        $res = $this->User_model->contactList($userId,$data); 
+        if($res){
+            $response = array('status'=>SUCCESS,'message'=>ResponseMessages::getStatusCodeMessage(302),'data'=>$res);
+        }else{
+            $response = array('status'=>FAIL,'message'=>ResponseMessages::getStatusCodeMessage(509));
+        }
+        $this->response($response);     
+        
     }//End function
 
 
